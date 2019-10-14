@@ -21,7 +21,7 @@ buildscript {
         artifactGroup = "org.cfg4j.sample"
         artifactVersion = "1.0.0-SNAPSHOT"
 
-        springBootVersion = "1.2.6.RELEASE"
+        springBootVersion = "2.1.9.RELEASE"
         cfg4jVersion = "4.4.0"
     }
 }
