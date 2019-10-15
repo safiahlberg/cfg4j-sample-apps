@@ -39,20 +39,13 @@ public class MainController implements CommandLineRunner {
     Boolean wasAwake = false;
 
     // ReksioConfig reksioConfig = configurationProvider.bind("reksio", ReksioConfig.class);
-    // DatabasePoolConfig databasePoolConfig = configurationProvider.bind("databasepool", DatabasePoolConfig.class);
+    DatabasePoolConfig databasePoolConfig = configurationProvider.bind("databasePool", DatabasePoolConfig.class);
     SearchConfig searchConfig = configurationProvider.bind("search", SearchConfig.class);
 
     while (true) {
-      /*
-      if (wasAwake != reksioConfig.awake()) {
-        System.out.println("Reksio is now " + (reksioConfig.awake() ? "awake" : "asleep"));
-
-        wasAwake = reksioConfig.awake();
-      }
-       */
 
       System.out.println("Search default Query: " + searchConfig.defaultQuery());
-      // System.out.println("Database Pool url: " + databasePoolConfig.url());
+      System.out.println("Database Pool url: " + databasePoolConfig.url());
 
       Thread.sleep(3000);
     }
