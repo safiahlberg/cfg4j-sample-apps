@@ -22,47 +22,58 @@ import org.cfg4j.source.context.environment.Environment;
 import org.cfg4j.source.context.environment.ImmutableEnvironment;
 import org.cfg4j.source.context.filesprovider.ConfigFilesProvider;
 import org.cfg4j.source.git.GitConfigurationSourceBuilder;
+import org.cfg4j.source.git.PathResolver;
 import org.cfg4j.source.reload.ReloadStrategy;
 import org.cfg4j.source.reload.strategy.PeriodicalReloadStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Configuration
 public class ConfigBeans {
 
-  @Value("${configRepoPath:https://github.com/cfg4j/cfg4j-git-sample-config.git}")
-  private String configRepoPath; // Run with -DconfigRepoPath=<repositoryUrl> parameter to override
+    @Value("${configRepoPath:https://github.com/cfg4j/cfg4j-git-sample-config.git}")
+    private String configRepoPath; // Run with -DconfigRepoPath=<repositoryUrl> parameter to override
 
-  @Value("${configBranch:production-env}")
-  private String branch; // Run with -DconfigBranch=<branchName> parameter to override
+    @Value("${configBranch:production-env}")
+    private String branch; // Run with -DconfigBranch=<branchName> parameter to override
 
-  @Bean
-  public ConfigurationProvider configurationProvider() {
-    // Specify which files to load. Configuration from both files will be merged.
-    ConfigFilesProvider configFilesProvider = () -> Arrays.asList(Paths.get("application.properties"), Paths.get("otherConfig.properties"));
+    @Bean
+    public ConfigurationProvider configurationProvider() {
+        // Specify which files to load. Configuration from both files will be merged.
+        ConfigFilesProvider configFilesProvider = () -> Arrays.asList(Paths.get("configuration.yaml"));
 
-    // Use Git repository as configuration store
-    ConfigurationSource source = new GitConfigurationSourceBuilder()
-        .withRepositoryURI(configRepoPath)
-        .withConfigFilesProvider(configFilesProvider)
-        .build();
+        for (Path path : configFilesProvider.getConfigFiles()) {
+            System.out.println("Path: " + path.getFileName());
+        }
 
-    // Select branch to use (use new DefaultEnvironment()) for master
-    Environment environment = new ImmutableEnvironment(branch);
+        // Use Git repository as configuration store
+        ConfigurationSource source = new GitConfigurationSourceBuilder()
+                .withRepositoryURI(configRepoPath)
+                .withConfigFilesProvider(configFilesProvider)
+                .build();
 
-    // Reload configuration every 5 seconds
-    ReloadStrategy reloadStrategy = new PeriodicalReloadStrategy(5, TimeUnit.SECONDS);
+        // Select branch to use (use new DefaultEnvironment()) for master
+        Environment environment = new ImmutableEnvironment(branch);
 
-    // Create provider
-    return new ConfigurationProviderBuilder()
-        .withConfigurationSource(source)
-        .withEnvironment(environment)
-        .withReloadStrategy(reloadStrategy)
-        .build();
-  }
+        // Reload configuration every 5 seconds
+        ReloadStrategy reloadStrategy = new PeriodicalReloadStrategy(5, TimeUnit.SECONDS);
+
+        // Create provider
+        return new ConfigurationProviderBuilder()
+                .withConfigurationSource(source)
+                .withEnvironment(environment)
+                .withReloadStrategy(reloadStrategy)
+                .build();
+    }
 }
