@@ -53,10 +53,6 @@ public class ConfigBeans {
         // Specify which files to load. Configuration from both files will be merged.
         ConfigFilesProvider configFilesProvider = () -> Arrays.asList(Paths.get("configuration.yaml"));
 
-        for (Path path : configFilesProvider.getConfigFiles()) {
-            System.out.println("Path: " + path.getFileName());
-        }
-
         // Use Git repository as configuration store
         ConfigurationSource source = new GitConfigurationSourceBuilder()
                 .withRepositoryURI(configRepoPath)
